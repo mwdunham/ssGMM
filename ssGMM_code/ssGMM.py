@@ -23,7 +23,7 @@ SEMI-SUPERVISED GAUSSIAN MIXTURE MODELS (ssGMM)
     # GAMMA[L:(L+U),:]: probability matrix for each unlabeled data point belonging to each class, size = (len(U), K)
     # Objective: array containing the value of the objective function at each iteration, the first entry is the starting value of the objective function prior to using the EM algorithm
 
-# This code also implements an 'early stop'. At any given iteration, if the ssGMM objective function becomes smaller (worse), the algorithm will stop and will use the information recovered from the PREVIOUS iteration   
+# This code also implements an 'early stop'. At any given iteration, if the ssGMM objective function becomes smaller (worse), the algorithm will stop and will use the information recovered from the PREVIOUS iteration.   
 
 def ss_GaussianMixtureModels_v2(Xtrain, ytrain, Xtest, ytest, K, beta, max_iterations, tol, cond_tolerance):
     from sklearn.metrics import accuracy_score
