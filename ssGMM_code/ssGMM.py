@@ -1,7 +1,7 @@
 """
 Created on August 12, 2019
 @author: mwdunham
-Python versions: 3.6.6 - 3.7.3
+Tested with Python versions: 3.6.6 - 3.7.3
 
 SEMI-SUPERVISED GAUSSIAN MIXTURE MODELS (ssGMM)
 """
@@ -16,16 +16,18 @@ SEMI-SUPERVISED GAUSSIAN MIXTURE MODELS (ssGMM)
     # beta: tradeoff parameter between unlabeled and labeled data. Must be (0 < beta < 1). beta = 1 is equivalent to 100% supervised, beta = 0 is equivalent to 100% unsupervised
     # max_iterations: maximum number of iterations to perform for optimzing the ssGMM objective function
     # tol: the tolerance for the ssGMM objective function; it represents the 'percent' change in the objective function. If you wish the algorithm to stop once the obj is only changing by <=1%, then tol=1.0
-    # cond_tolerance: the cutoff for singular values - the default for pinv is 1E-15 which seems a bit too low
+    # early_stop: a boolean variable, i.e. 'True' or 'False'. 
+        ## if 'True': at any given iteration, if the ssGMM objective function becomes smaller (worse), the algorithm will stop and will use the information recovered from the PREVIOUS iteration   
+        ## if 'False': no change
 
 #Information regarding OUTPUTS (given by return statement at the bottom):
     # GMM_label_pred: thresholded predictions for each unlabeled data point derived from the GAMMA matrix
     # GAMMA[L:(L+U),:]: probability matrix for each unlabeled data point belonging to each class, size = (len(U), K)
     # Objective: array containing the value of the objective function at each iteration, the first entry is the starting value of the objective function prior to using the EM algorithm
 
-# This code also implements an 'early stop'. At any given iteration, if the ssGMM objective function becomes smaller (worse), the algorithm will stop and will use the information recovered from the PREVIOUS iteration   
-
-def ss_GaussianMixtureModels(Xtrain, ytrain, Xtest, ytest, K, beta, max_iterations, tol, cond_tolerance):
+def ss_GaussianMixtureModels(Xtrain, ytrain, Xtest, ytest, K, beta, max_iterations, tol, early_stop):
+    cond_tolerance = 1E-10 ##the cutoff for singular values - the default for pinv is 1E-15 which was discovered to be too low through testing
+    
     from sklearn.metrics import accuracy_score
     import numpy as np
 
@@ -42,9 +44,7 @@ def ss_GaussianMixtureModels(Xtrain, ytrain, Xtest, ytest, K, beta, max_iteratio
             for i in range(0,n,1):
                 if y[i] == j:
                     sum += 1
-            pi.append(sum/n) 
-        #print("Training data class prior probabilities: \n", pi)
-    
+            pi.append(sum/n)     
         
         ####################################################################
         ####       SOLVING FOR THE CLASS SPECIFIC GAUSSIAN MEAN         ####
@@ -57,9 +57,7 @@ def ss_GaussianMixtureModels(Xtrain, ytrain, Xtest, ytest, K, beta, max_iteratio
                 if y[i] == uniq[j]:
                     sum = sum + X[i,:]
                     counter += 1
-            mu_y[j,:] = (1/counter)*sum
-        #print("Training data class specific Gaussian mean: \n", mu_y)
-    
+            mu_y[j,:] = (1/counter)*sum    
         
         ####################################################################
         ####     SOLVING FOR THE CLASS SPECIFIC GAUSSAIN COVARIANCE    #####
@@ -80,7 +78,6 @@ def ss_GaussianMixtureModels(Xtrain, ytrain, Xtest, ytest, K, beta, max_iteratio
                     sum = sum + np.outer(np.transpose(X[i,:] - mu_y[j,:]),(X[i,:] - mu_y[j,:]))
                     counter += 1
             sigma_dic[sigma_ID] = (1/counter)*sum
-        #print("Training data class specific Gaussain covariance: \n", sigma_dic)
     
         return pi, mu_y, sigma_dic
     
@@ -120,7 +117,6 @@ def ss_GaussianMixtureModels(Xtrain, ytrain, Xtest, ytest, K, beta, max_iteratio
             sigma_inv[sigma_ID] = np.linalg.pinv(sigma[sigma_ID], rcond = cond_tolerance)
             #det_sigma.append(np.linalg.det(sigma[sigma_ID]))
         except np.linalg.LinAlgError:
-            #print(sigma[sigma_ID])
             print("The covariance matrix associated with Class " + str(uniq[j]) + " is still SINGULAR")
             sigma_inv[sigma_ID] = np.linalg.inv(sigma[sigma_ID], rcond = cond_tolerance)
         except:
@@ -129,7 +125,8 @@ def ss_GaussianMixtureModels(Xtrain, ytrain, Xtest, ytest, K, beta, max_iteratio
                 
                 
     #########   MULTI-VARIATE GAUSSIAN PROBABILITY DENSITY FUNCTION   #########
-    # Incorporates the covariance matrix inverses and covariance determinants where the built in function does not
+    # Incorporates the covariance matrix inverses and covariance determinants where the built in function does not,
+    # and doing so shortens the computation time
     def gaussian_PDF(x,mu,sigma,det_sigma,sigma_inv):
         return (1/np.sqrt((2*np.pi)**(d)*det_sigma))*np.exp(-0.5*np.matmul((x-mu).T, np.matmul(sigma_inv, (x-mu))))
         
@@ -251,11 +248,12 @@ def ss_GaussianMixtureModels(Xtrain, ytrain, Xtest, ytest, K, beta, max_iteratio
         
         Objective.append(objective_func(L, U, D, ytrain, pi, mu, sigma, det_sigma, sigma_inv))        
         
-        ## This is the implementation of the early stopping criteria
-        if (Objective[t] - Objective[t+1]) > 0:
-            print('Objective function is INCREASING... stopping early and using the GAMMA from the previous iteration')
-            GAMMA = np.array(GAMMA_old)
-            break
+        ## The early stopping criteria
+        if early_stop == 'True': 
+            if (Objective[t] - Objective[t+1]) > 0:
+                print('Objective function is INCREASING... stopping early and using the GAMMA from the previous iteration')
+                GAMMA = np.array(GAMMA_old)
+                break
         
         obj_change = abs((Objective[t+1] - Objective[t])/(Objective[t]))*100
         t = t + 1
