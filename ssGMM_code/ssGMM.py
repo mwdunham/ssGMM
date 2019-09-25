@@ -125,16 +125,16 @@ def ss_GaussianMixtureModels(Xtrain, ytrain, Xtest, ytest, K, beta, max_iteratio
                 
     ###########################################################################            
     #########   MULTI-VARIATE GAUSSIAN PROBABILITY DENSITY FUNCTION   #########
-	###########################################################################
+    ###########################################################################
     # For the EM algorithm below, the objective function has to be computed MANY times, and the built in function (scipy.stats.multivariate_normal.pdf) recomputes the covariance matrix inverses/determinants, which is computationally inefficient.
 	# This function below incorporates the pre-computed covariance matrix inverses and covariance determinants, and this drastically improves the computation time (5-6x faster)
     
-	def gaussian_PDF(x,mu,sigma,det_sigma,sigma_inv):
+    def gaussian_PDF(x,mu,sigma,det_sigma,sigma_inv):
         return (1/np.sqrt((2*np.pi)**(d)*det_sigma))*np.exp(-0.5*np.matmul((x-mu).T, np.matmul(sigma_inv, (x-mu))))
         
     ###########################################################################
     ###################   OBJECTIVE FUNCTION FOR ssGMM   ######################
-	###################            Equation 7            ######################
+    ###################            Equation 7            ######################
     ###########################################################################
 
     def objective_func(L, U, D, ytrain, pi, mu, sigma, det_sigma, sigma_inv): 
@@ -176,7 +176,6 @@ def ss_GaussianMixtureModels(Xtrain, ytrain, Xtest, ytest, K, beta, max_iteratio
         ##########################
         for i in range(0,n,1):
         #%%% EQUATION 9 %%%#
-		
             ## For LABELED instances
             if i < L:
                 for j in range(0,len(uniq),1):
@@ -273,7 +272,7 @@ def ss_GaussianMixtureModels(Xtrain, ytrain, Xtest, ytest, K, beta, max_iteratio
     k = 0
     for i in range(L,L+U,1):
         #%%% EQUATION 10 %%%#
-		cl = GAMMA[i,:].argmax()
+        cl = GAMMA[i,:].argmax()
         GMM_label_pred[k] = uniq[cl]
         k = k + 1
         
