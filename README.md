@@ -17,7 +17,7 @@ The IRIS dataset application is included to serve as a quick test to ensure the 
 The `Well_log_classification` example contains all the necessary information for reproducing all the figures/results in our paper. See the README in that directory for more information.
 
 ## Requirements
-The ssGMM code is written in Python 3 and the associated Jupyter notebooks use standard packages included with Anaconda or other distribution platforms. The versions of these packages are given below and are up-to-date as of mid-2019. If you have different versions, everything will likely still run properly, but you **must** be using Python 3, the ssGMM code will not work with Python 2 and the syntax in the Jupyter-Notebooks is written according to Python 3.
+The ssGMM code is written in Python 3 and the associated Jupyter notebooks use standard packages included with Anaconda or other distribution platforms. The versions of these packages that have been tested are given below and are up-to-date as of mid-2019. If you have different versions, everything will likely still run properly, but you **must** be using Python 3, the ssGMM code will not work with Python 2 and the syntax in the Jupyter-Notebooks is written according to Python 3.
 
 * Python (tested with 3.6.6 - 3.7.3)
 * Pandas:       0.24.2
