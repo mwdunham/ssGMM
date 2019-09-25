@@ -127,7 +127,7 @@ def ss_GaussianMixtureModels(Xtrain, ytrain, Xtest, ytest, K, beta, max_iteratio
     #########   MULTI-VARIATE GAUSSIAN PROBABILITY DENSITY FUNCTION   #########
     ###########################################################################
     # For the EM algorithm below, the objective function has to be computed MANY times, and the built in function (scipy.stats.multivariate_normal.pdf) recomputes the covariance matrix inverses/determinants, which is computationally inefficient.
-	# This function below incorporates the pre-computed covariance matrix inverses and covariance determinants, and this drastically improves the computation time (5-6x faster)
+    # This function below incorporates the pre-computed covariance matrix inverses and covariance determinants, and this drastically improves the computation time (5-6x faster)
     
     def gaussian_PDF(x,mu,sigma,det_sigma,sigma_inv):
         return (1/np.sqrt((2*np.pi)**(d)*det_sigma))*np.exp(-0.5*np.matmul((x-mu).T, np.matmul(sigma_inv, (x-mu))))
