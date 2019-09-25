@@ -18,7 +18,7 @@ SEMI-SUPERVISED GAUSSIAN MIXTURE MODELS (ssGMM)
     # tol: the tolerance for the ssGMM objective function; it represents the 'percent' change in the objective function. If you wish the algorithm to stop once the obj is only changing by <=1%, then tol=1.0
     # early_stop: a boolean variable, i.e. 'True' or 'False'. 
         ## if 'True': at any given iteration, if the ssGMM objective function becomes smaller (worse), the algorithm will stop and will use the information recovered from the PREVIOUS iteration   
-        ## if 'False': no change
+        ## if 'False': the code will run until the tol or max_iterations is reached
 
 #Information regarding OUTPUTS (given by return statement at the bottom):
     # GMM_label_pred: thresholded predictions for each unlabeled data point derived from the GAMMA matrix
@@ -87,17 +87,17 @@ def ss_GaussianMixtureModels(Xtrain, ytrain, Xtest, ytest, K, beta, max_iteratio
     ##########################
     #### Data preparation ####
     ##########################
-    L = np.size(ytrain)
+    L = np.size(ytrain) #%%% EQUATION 1 %%%#
     uniq = np.unique(ytrain)
     uniq = uniq.tolist()
-    U = np.size(ytest)
+    U = np.size(ytest) #%%% EQUATION 2 %%%#
     print('Number of labeled data: ' + str(L))
     print('Number of unlabeled data: ' + str(U))
-    D = np.concatenate((Xtrain, Xtest), axis=0)
+    D = np.concatenate((Xtrain, Xtest), axis=0) #%%% EQUATION 4 %%%#
     (n, d) = np.shape(D)
     
     # ssGMM needs starting values for the Gaussian means & covariances for each class, so a Bayes classifier on the LABELED data is used to determine these
-    pi, mu, sigma = Bayes(Xtrain, ytrain)
+    pi, mu, sigma = Bayes(Xtrain, ytrain) #%%% EQUATION 8 %%%#
     
     
     #### Using a limited number of training data can cause the covariance matrices of the resulting classes 
@@ -123,18 +123,21 @@ def ss_GaussianMixtureModels(Xtrain, ytrain, Xtest, ytest, K, beta, max_iteratio
             print("Unexpected error")
             raise 
                 
-                
+    ###########################################################################            
     #########   MULTI-VARIATE GAUSSIAN PROBABILITY DENSITY FUNCTION   #########
-    # Incorporates the covariance matrix inverses and covariance determinants where the built in function does not,
-    # and doing so shortens the computation time
-    def gaussian_PDF(x,mu,sigma,det_sigma,sigma_inv):
+	###########################################################################
+    # For the EM algorithm below, the objective function has to be computed MANY times, and the built in function (scipy.stats.multivariate_normal.pdf) recomputes the covariance matrix inverses/determinants, which is computationally inefficient.
+	# This function below incorporates the pre-computed covariance matrix inverses and covariance determinants, and this drastically improves the computation time (5-6x faster)
+    
+	def gaussian_PDF(x,mu,sigma,det_sigma,sigma_inv):
         return (1/np.sqrt((2*np.pi)**(d)*det_sigma))*np.exp(-0.5*np.matmul((x-mu).T, np.matmul(sigma_inv, (x-mu))))
         
     ###########################################################################
     ###################   OBJECTIVE FUNCTION FOR ssGMM   ######################
+	###################            Equation 7            ######################
     ###########################################################################
 
-    def objective_func(L, U, D, ytrain, pi, mu, sigma, det_sigma, sigma_inv):
+    def objective_func(L, U, D, ytrain, pi, mu, sigma, det_sigma, sigma_inv): 
         sum_label = 0
         ## FOR THE LABELED PART OF THE OBJECTIVE FUNCTION
         for i in range(0,L,1):
@@ -172,7 +175,8 @@ def ss_GaussianMixtureModels(Xtrain, ytrain, Xtest, ytest, K, beta, max_iteratio
         ######## E-STEP ##########
         ##########################
         for i in range(0,n,1):
-            
+        #%%% EQUATION 9 %%%#
+		
             ## For LABELED instances
             if i < L:
                 for j in range(0,len(uniq),1):
@@ -184,7 +188,6 @@ def ss_GaussianMixtureModels(Xtrain, ytrain, Xtest, ytest, K, beta, max_iteratio
                 sum = 0
                 for j in range(0,len(uniq),1):
                     sigma_ID = "SIGMA_K_" + str(uniq[j])
-                    #GAMMA[i,j] = pi[j]*multivariate_normal.pdf(D[i,:], mu[j,:], sigma[sigma_ID])
                     GAMMA[i,j] = pi[j]*gaussian_PDF(D[i,:], mu[j,:], sigma[sigma_ID], det_sigma[j], sigma_inv[sigma_ID])
                     sum = sum + GAMMA[i,j]
                 GAMMA[i,:] = (1/sum)*GAMMA[i,:]
@@ -195,17 +198,17 @@ def ss_GaussianMixtureModels(Xtrain, ytrain, Xtest, ytest, K, beta, max_iteratio
         ##########################
         
         for j in range(0,len(uniq),1):
-            
+        #%%% EQUATIONS FROM STEP 3 %%%#    
             nl = 0
             nu = 0
             for i in range(0,L,1):
                 nl = nl + GAMMA[i,j]
             for i in range(L,L+U,1):
                 nu = nu + GAMMA[i,j]
-            factor = (beta*nl + (1-beta)*nu) #this is a 'factor' that is common in each of the three parameters below
+            C = (beta*nl + (1-beta)*nu) #this is a factor that is common in each of the three parameters below
 
             #### Updating the cluster prior probabilities, pi ####          
-            pi[j] = (factor)/(beta*L + (1-beta)*U)
+            pi[j] = (C)/(beta*L + (1-beta)*U)
             
             #### Updating the cluster means, mu ####
             mean_sumL = 0
@@ -214,7 +217,7 @@ def ss_GaussianMixtureModels(Xtrain, ytrain, Xtest, ytest, K, beta, max_iteratio
                 mean_sumL = mean_sumL + GAMMA[i,j]*D[i,:]
             for i in range(L,L+U,1):
                 mean_sumU = mean_sumU + GAMMA[i,j]*D[i,:]       
-            mu[j,:] = (beta*mean_sumL + (1-beta)*mean_sumU)/(factor)
+            mu[j,:] = (beta*mean_sumL + (1-beta)*mean_sumU)/(C)
             
             #### Updating the cluster covariance matrices, sigma ####
             sigma_ID = "SIGMA_K_" + str(uniq[j])
@@ -226,7 +229,7 @@ def ss_GaussianMixtureModels(Xtrain, ytrain, Xtest, ytest, K, beta, max_iteratio
             for i in range(L,L+U,1):
                 sigma_sumU = sigma_sumU + GAMMA[i,j]*np.outer(np.transpose(D[i,:] - mu[j,:]),(D[i,:] - mu[j,:]))
             
-            sigma[sigma_ID] = (beta*sigma_sumL + (1-beta)*sigma_sumU)/(factor)
+            sigma[sigma_ID] = (beta*sigma_sumL + (1-beta)*sigma_sumU)/(C)
             
             #### Updating the covariance matrix determinants and covariance inverses ####
             try: # Code that will (maybe) throw an exception
@@ -269,8 +272,9 @@ def ss_GaussianMixtureModels(Xtrain, ytrain, Xtest, ytest, K, beta, max_iteratio
     GMM_label_pred = np.ones(U)*99.99
     k = 0
     for i in range(L,L+U,1):
-        c = GAMMA[i,:].argmax()
-        GMM_label_pred[k] = uniq[c]
+        #%%% EQUATION 10 %%%#
+		cl = GAMMA[i,:].argmax()
+        GMM_label_pred[k] = uniq[cl]
         k = k + 1
         
     semi_GMM_accuracy = accuracy_score(ytest, GMM_label_pred)
