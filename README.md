@@ -7,7 +7,7 @@ Dunham et al., *in review*, Improved well log classification using semi-supervis
 
 This repository contains three directories:
 * `ssGMM_code`:   Contains the .py code for ssGMM.
-* `IRIS_dataset`: Contains a Jupyter-Notebook that applies ssGMM to the [IRIS dataset](https://archive.ics.uci.edu/ml/datasets/iris)
+* `IRIS_dataset`: Contains a Jupyter-Notebook that applies ssGMM to the [IRIS dataset](https://archive.ics.uci.edu/ml/datasets/iris) (this is a quick demo that is used to test the code)
 * `Well_log_classification`: Contains a three-part series of Jupyter-Notebooks of applying ssGMM and two supervised methods to a well log classification example where the original data can be found [here](https://github.com/seg/2016-ml-contest).
 
 The ssGMM code works as a function with a series of inputs (i.e. training data, testing data, training labels, testing labels, hyper-parameters, etc.) and outputs (predicted labels for testing data, probability matrix for testing data, objective function values). Have a look through the comments in the code to obtain more details on how to operate it.
