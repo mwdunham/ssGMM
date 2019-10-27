@@ -4,6 +4,18 @@ Created on August 12, 2019
 Tested with Python versions: 3.6.6 - 3.7.3
 
 SEMI-SUPERVISED GAUSSIAN MIXTURE MODELS (ssGMM)
+	This code is based on the implementation given by:
+		@Article{Yan_2017,
+		  author   = {Yan, H. and Zhou, J. and Pang, C. K.},
+		  title    = {Gaussian mixture model using semisupervised learning for probabilistic fault diagnosis under new data categories},
+		  journal  = {IEEE Transactions on Instrumentation and Measurement},
+		  year     = {2017},
+		  volume   = {66},
+		  number   = {4},
+		  pages    = {723-733},
+		  doi      = {10.1109/TIM.2017.2654552},
+		  file     = {:Papers\\Yan et al. (2017) - GMM using semi-supervised learning for probabilistic fault diagnosis.pdf:PDF},
+		  keywords = {semi-supervised, ssGMM, machine fault diagnosis}}
 """
 # NOTE: A test-train-split of the data needs to be performed before calling this function
 
