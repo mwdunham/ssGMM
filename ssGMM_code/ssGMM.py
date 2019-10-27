@@ -12,10 +12,9 @@ SEMI-SUPERVISED GAUSSIAN MIXTURE MODELS (ssGMM)
     # ytrain: Training data labels 
     # Xtest: Testing data features (d-dimensional)
     # ytest: Testing data labels
-    # K: number of classes
     # beta: tradeoff parameter between unlabeled and labeled data. Must be (0 < beta < 1). beta = 1 is equivalent to 100% supervised, beta = 0 is equivalent to 100% unsupervised
-    # max_iterations: maximum number of iterations to perform for optimzing the ssGMM objective function
     # tol: the tolerance for the ssGMM objective function; it represents the 'percent' change in the objective function. If you wish the algorithm to stop once the obj is only changing by <=1%, then tol=1.0
+	# max_iterations: maximum number of iterations to perform for optimzing the ssGMM objective function
     # early_stop: a boolean variable, i.e. 'True' or 'False'. 
         ## if 'True': at any given iteration, if the ssGMM objective function becomes smaller (worse), the algorithm will stop and will use the information recovered from the PREVIOUS iteration   
         ## if 'False': the code will run until the tol or max_iterations is reached
@@ -25,7 +24,7 @@ SEMI-SUPERVISED GAUSSIAN MIXTURE MODELS (ssGMM)
     # GAMMA[L:(L+U),:]: probability matrix for each unlabeled data point belonging to each class, size = (len(U), K)
     # Objective: array containing the value of the objective function at each iteration, the first entry is the starting value of the objective function prior to using the EM algorithm
 
-def ss_GaussianMixtureModels(Xtrain, ytrain, Xtest, ytest, K, beta, max_iterations, tol, early_stop):
+def ss_GaussianMixtureModels(Xtrain, ytrain, Xtest, ytest, beta, tol, max_iterations, early_stop):
     cond_tolerance = 1E-10 ##the cutoff for singular values - the default for pinv is 1E-15 which was discovered to be too low through testing
     
     from sklearn.metrics import accuracy_score
@@ -87,9 +86,12 @@ def ss_GaussianMixtureModels(Xtrain, ytrain, Xtest, ytest, K, beta, max_iteratio
     ##########################
     #### Data preparation ####
     ##########################
+    
     L = np.size(ytrain) #%%% EQUATION 1 %%%#
     uniq = np.unique(ytrain)
+    K = len(uniq) # The number of classes
     uniq = uniq.tolist()
+	
     U = np.size(ytest) #%%% EQUATION 2 %%%#
     print('Number of labeled data: ' + str(L))
     print('Number of unlabeled data: ' + str(U))
