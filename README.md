@@ -2,7 +2,7 @@
 This repository contains a semi-supervised Gaussian mixture models (ssGMM) code written in Python 3 that is necessary for reproducing the results in our paper:
 
 ``
-Dunham et al., *in review*, Improved well log classification using semi-supervised Gaussian mixture models and a new model selection strategy: Computers and Geosciences, 11 figures, 4 tables.
+Dunham et al., 2020, Improved well log classification using semi-supervised Gaussian mixture models and a new model selection strategy: Computers and Geosciences, 140, 1-12.
 ``
 
 This repository contains three directories:
@@ -35,10 +35,15 @@ The only package in this list that is *external* to a python distribution platfo
 Please cite our paper if you use this code in your own work:
 
 ```
-@Article{Dunham_2020_ssGMM,
-  title={Improved well log classification using semi-supervised Gaussian mixture models and a new model selection strategy},
-  author={Dunham, Michael W. and Malcolm, Alison and Welford, J. Kim},
-  journal={Computers and Geosciences},
-  year={in review}
-}
+@article{DUNHAM2020104501,
+title = {Improved well log classification using semisupervised Gaussian mixture models and a new hyper-parameter selection strategy},
+journal = {Computers & Geosciences},
+volume = {140},
+pages = {1-12},
+year = {2020},
+issn = {0098-3004},
+doi = {https://doi.org/10.1016/j.cageo.2020.104501},
+url = {https://www.sciencedirect.com/science/article/pii/S0098300419309951},
+author = {Michael W. Dunham and Alison Malcolm and J. Kim Welford},
+keywords = {Lithofacies, Well logs, Semisupervised, Classification, Hyper-parameter selection}}
 ```
