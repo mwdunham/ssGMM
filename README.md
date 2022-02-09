@@ -1,5 +1,5 @@
-## UPDATE - April 2021
-An update is being made to the ssGMM code that will be available soon. The current version is written in 'function' form which is not user friendly. I am currently getting a version of the code written as a python Class. I am also adding functionality so the ssGMM can actually behave as a classifier (perform induction rather than just transduction). I anticipate this updated version will be made available in this repository by the end of Summer 2021. If you would like the 'beta' version sooner, send me an email (mwdunham@mun.ca). Happy learning! 
+## UPDATE - February 2022
+An update is being made to the ssGMM code that will be available soon. The current version is written in 'function' form which is not user friendly. I am currently getting a version of the code written as a python Class. I am also adding functionality so the ssGMM can actually behave as a classifier (perform induction rather than just transduction). This update was delayed, but I anticipate this updated version will be made available in this repository by ~ May 2022. If you would like the 'beta' version sooner, send me an email (mwdunham@mun.ca). Happy learning! 
 
 # Semi-supervised Gaussian mixture models (ssGMM)
 This repository contains a semi-supervised Gaussian mixture models (ssGMM) code written in Python 3 that is necessary for reproducing the results in our paper:
